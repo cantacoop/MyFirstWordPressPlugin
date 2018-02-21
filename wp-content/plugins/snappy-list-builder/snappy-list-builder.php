@@ -35,9 +35,9 @@ add_action( 'wp_enqueue_scripts', 'slb_public_scripts');
 add_filter('acf/settings/path', 'slb_acf_settings_path');
 add_filter('acf/settings/dir', 'slb_acf_settings_dir');
 add_filter('acf/settings/show_admin', 'slb_acf_show_admin');
-// if (!defined('ACF_LITE')) {
-//     define('ACF_LITE', true); // turn off ACF plugin menu
-// }
+if (!defined('ACF_LITE')) {
+    define('ACF_LITE', true); // turn off ACF plugin menu
+}
 
 /* 2. SHORTCODES */
 // 2.1
@@ -531,3 +531,10 @@ function slb_get_subscriber_data( $subscriber_id ) {
     // return subscriber data
     return $subscriber_data;
 }
+
+/* 7. CUSTOM POST TYPES */
+// 7.1 subscribers
+include_once( plugin_dir_path( __FILE__ ) . 'cpt/slb_subscriber.php');
+
+// 7.1 list
+include_once( plugin_dir_path( __FILE__ ) . 'cpt/slb_list.php');
