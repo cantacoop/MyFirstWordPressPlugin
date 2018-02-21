@@ -28,6 +28,17 @@ add_filter( "manage_slb_list_posts_custom_column", "slb_list_column_data", 1, 2 
 add_action( 'wp_ajax_nopriv_slb_save_subscription', 'slb_save_subscription' ); // regular website visitor
 add_action( 'wp_ajax_slb_save_subscription', 'slb_save_subscription' ); // admin user
 
+// 1.5 hint: load external files to public website
+add_action( 'wp_enqueue_scripts', 'slb_public_scripts');
+
+// 1.6 Advanced Custom Fields Settings
+add_filter('acf/settings/path', 'slb_acf_settings_path');
+add_filter('acf/settings/dir', 'slb_acf_settings_dir');
+add_filter('acf/settings/show_admin', 'slb_acf_show_admin');
+// if (!defined('ACF_LITE')) {
+//     define('ACF_LITE', true); // turn off ACF plugin menu
+// }
+
 /* 2. SHORTCODES */
 // 2.1
 function slb_register_shortcodes() {
@@ -45,15 +56,25 @@ function slb_form_shortcode( $args, $content="" ) {
         $list_id = (int)$args['id'];
     }
 
+    // title
+    $title = '';
+    if ( isset($args['title']) ) {
+        $title = (string)$args['title'];
+    }
+
     // setup our output variable - the form html
     $output = '
         <div class="slb">
             <form id="slb_form" name="slb_form" class="slb-form" method="post"
                 action="/wp-admin/admin-ajax.php?action=slb_save_subscription">
 
-                <input type="hidden" name="slb_list" value="' . $list_id . '" />
+                <input type="hidden" name="slb_list" value="' . $list_id . '" />';
 
-                <p class="slb-input-container">
+                if (strlen($title)) {
+                    $output .= '<h3 class="slb-title">' . $title . '</h3>';
+                }
+
+                $output .= '<p class="slb-input-container">
                     <label>Your Name</label><br />
                     <input type="text" name="slb_fname" placeholder="First Name" />
                     <input type="text" name="slb_lname" placeholder="Last Name" />
@@ -173,6 +194,31 @@ function slb_list_column_data( $columns, $post_id ) {
 
     // echo the output
     echo $output;
+}
+
+/* 4. EXTERNAL SCRIPTS */
+// 4.1 Include ACF
+include_once( plugin_dir_path( __FILE__ ) . 'lib/advanced-custom-fields/acf.php');
+
+// 4.2 hint: loads external files into PUBLIC website
+function slb_public_scripts() {
+
+    // register scripts with WordPress's internal library
+    wp_register_script( 'snappy-list-builder-js-public', 
+        plugins_url( '/js/public/snappy-list-builder.js', __FILE__ ), 
+        array('jquery'), 
+        '', 
+        true 
+    );
+
+    // register style with WordPress's internal library
+    wp_register_style( 'snappy-list-builder-css-public', 
+        plugins_url( '/css/public/snappy-list-builder.css', __FILE__ )
+    );
+
+    // add to que of scripts that get loaded into every page
+    wp_enqueue_script( 'snappy-list-builder-js-public' );
+    wp_enqueue_style( 'snappy-list-builder-css-public' );
 }
 
 /* 5. ACTIONS */
