@@ -35,9 +35,9 @@ add_action( 'wp_enqueue_scripts', 'slb_public_scripts');
 add_filter('acf/settings/path', 'slb_acf_settings_path');
 add_filter('acf/settings/dir', 'slb_acf_settings_dir');
 add_filter('acf/settings/show_admin', 'slb_acf_show_admin');
-if (!defined('ACF_LITE')) {
-    define('ACF_LITE', true); // turn off ACF plugin menu
-}
+// if (!defined('ACF_LITE')) {
+//     define('ACF_LITE', true); // turn off ACF plugin menu
+// }
 
 /* 2. SHORTCODES */
 // 2.1
@@ -195,6 +195,32 @@ function slb_list_column_data( $columns, $post_id ) {
     // echo the output
     echo $output;
 }
+
+// 3.5 hint: register custom plugin admin menu
+function slb_admin_menus() {
+    /* main menu */
+    $top_menu_item = 'slb_dashboard_admin_page';
+
+    add_menu_page('', 'List Builder', 'manage_options', 'slb_dashboard_admin_page',
+        'slb_dashboard_admin_page', 'dashicons-email-alt');
+
+    /* submenu item */
+    // dashboard
+    add_submenu_page( $top_menu_item, "", "Dashboard", "manage_options", $top_menu_item, $top_menu_item );
+
+    // email lists
+    add_submenu_page( $top_menu_item, "", "Email lists", "manage_options", "edit.php?post_type=slb_list" );
+
+    // subscribers
+    add_submenu_page( $top_menu_item, "", "Subscribers", "manage_options", "edit.php?post_type=slb_subscriber" );
+
+    // Import subscribers
+    add_submenu_page( $top_menu_item, "", "Import Subscribers", "manage_options", "slb_import_admin_page", "slb_import_admin_page" );
+
+    // plugin options 
+    add_submenu_page( $top_menu_item, "", "Plugin Options", "slb_options_admin_page", "slb_options_admin_page" );
+}
+add_action( 'admin_menu', 'slb_admin_menus' );
 
 /* 4. EXTERNAL SCRIPTS */
 // 4.1 Include ACF
@@ -538,3 +564,54 @@ include_once( plugin_dir_path( __FILE__ ) . 'cpt/slb_subscriber.php');
 
 // 7.1 list
 include_once( plugin_dir_path( __FILE__ ) . 'cpt/slb_list.php');
+
+/* 8. ADMIN PAGES */
+// 8.1 hint: dashboard admin page
+function slb_dashboard_admin_page() {
+
+    $output = '
+        <div class="wrap">
+            <?php screen_icon(); ?>
+
+            <h2>Snappy List Builder</h2>
+
+            <p>The ultimate email list building plugin for wordpress. Capture new subscriber.
+            Reward subscribers with a custom download upon opt-in. Build ulimited lists.
+            Import and Export subscribers easily with .csv</p>
+        </div>
+    ';
+        
+    echo $output;
+}
+
+// 8.2 hint: import subscribers admin page
+function slb_import_admin_page() {
+
+    $output = '
+        <div class="wrap">
+            <?php screen_icon(); ?>
+
+            <h2>Import Subscribers</h2>
+
+            <p>Page description...</p>
+        </div>
+    ';
+
+    echo $output;
+}
+
+// 8.3 hint: plugin options admin page
+function slb_options_admin_page() {
+
+    $output = '
+        <div class="wrap">
+            <?php screen_icon(); ?>
+
+            <h2>Snappy List Builder Options</h2>
+
+            <p>Page description...</p>
+        </div>
+    ';
+
+    echo $output;
+}
